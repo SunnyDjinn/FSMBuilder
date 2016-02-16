@@ -37,6 +37,9 @@ class FSM:
 			return None
 
 	def addTransition(self, fromState, toState, symbol):
+		if symbol == "":
+			print "Cannot add transition: symbol field empty"
+			return
 		self.transitions.add(Transition(fromState, toState, symbol))
 		self.states.add(fromState)
 		self.states.add(toState)
@@ -256,8 +259,17 @@ class FSM:
 			alphabet.remove(EPSILON)
 		return alphabet
 
+
+#
+#
+# Refactor determinise
+# break every multicharacter symbols in multiple states that follow each other (before doing anything else)
+#
+#
 	@staticmethod
 	def determinise(fsm):
+		""" Determinises a NDFSM into and FSM - removes epsilon transitions, multiple chracters symbols and multiple transitions for the
+		same character between equivalent pairs of states """
 		fsm.renameStates(SPECIAL_STATE_CHARACTER, 0)
 		epsStates = {str(state):fsm.__epsilonAccessible(state) for state in fsm.states}
 		alphabet = fsm.__computeAlphabet()
@@ -283,7 +295,7 @@ class FSM:
 				del newState
 			activeStatesPointer += 1
 
-		DFSM = FSM(setToString(activeStates[0]), [])
+		DFSM = FSM(setToString(activeStates[0]), []) 
 		
 		for transition in newTransitions:
 			DFSM.addTransition(transition[0], transition[1], transition[2])
@@ -297,23 +309,43 @@ class FSM:
 		return DFSM
 
 
+#
+# No done yet 
+#
+#
 	def match(self, string):
+		""" Tries to match an input string to the FSM. If, at the end of the input string, 
+		the current state is accepting, returns True, else rturns false """
 		currentState = self.initialState;
 		currentStringIndex = 0
 
-		# All transitions from the current state
-		transitionsFromCurrentState = set(transition for transition in self.transitions if transition.fromState == currentState)
-		
-		# all transitions that matches something at the right index of the string
-		matchingSet = set(transition for transition in transitionsFromCurrentState if string.find(transition.symbol) == currentStringIndex)
-		
-		for transition in matchingSet:
-			print transition.toString()
+		# don't forget to determinise the FSM first!!
+		# determinise, just add a "garbage" state, so every transition exist? and then it's easier to compute?
+
+		while currentStringIndex != len(string):
+			# All transitions from the current state
+			transitionsFromCurrentState = set(transition for transition in self.transitions if transition.fromState == currentState)
+			
+			# all transitions that matches something at the right index of the string
+			# supposed to have only 1 transition in the set because its deterministic
+			matchingSet = set(transition for transition in transitionsFromCurrentState if string.find(transition.symbol) == currentStringIndex)
+			# matching set doesn't work: transition from 3 to 4 reading c (maybe it reads something else) says no match 
+			if len(matchingSet) == 0: # no matching transitions
+				print "no match from " + str(currentState)
+				return False
+			else:
+				currentState = matchingSet.pop().toState
+				currentStringIndex += 1
+		print currentState
+		if currentState in self.acceptingStates:
+			return True
+		return False
 
 
 
 
 def setToString(stateSet):
+	""" Returns the string related to the name of a set of states (concatenation of names of those sets) """
 	if len(stateSet) == 0:
 		return None
 	stringSet = ""

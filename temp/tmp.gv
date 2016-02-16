@@ -7,11 +7,11 @@ rankdir=LR
 	1
 	0
 	3
-		1 -> 2 [label=b]
 		0 -> 2 [label=b]
 		0 -> 1 [label=a]
-		3 -> 4 [label=d]
+		1 -> 2 [label=b]
 		2 -> 3 [label=c]
+		3 -> 4 [label=d]
 		3 -> 4 [label=c]
 	node [shape=plaintext]
 	""

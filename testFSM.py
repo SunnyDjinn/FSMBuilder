@@ -45,7 +45,10 @@ print w.toString()
 deter = FSM.determinise(w)
 print "Determizing w"
 print deter.toString()
-#deter.draw()
+deter.draw()
 
-deter.match("aa");
+print deter.match("a");
+print deter.match("b");
+print deter.match("aa");
+print deter.match("abcc");
 
