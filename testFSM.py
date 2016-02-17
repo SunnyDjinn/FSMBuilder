@@ -7,18 +7,18 @@ x.addTransition(1, 2, 'a')
 x.addTransition(1, 3, 'b')
 x.addTransition(2, 3, 'b')
 x.grantAcceptingState(3)
-print x.toString()
+#rint x.toString()
 
 k = FSM.kleene(x)
 
 print k.toString()
 #k.draw()
 
-dfsm = FSM.determinise(k)
+dfsm = FSM.determinise(x)
 print dfsm.toString()
-#dfsm.draw()
+dfsm.draw()
 
-
+exit()
 
 print "Creating y as follows..."
 y = FSM(4, [])

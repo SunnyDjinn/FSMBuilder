@@ -68,6 +68,12 @@ class FSM:
 				return True
 		return False
 
+	def isTransitionIn(self, fromState, toState, symbol):
+		for transition in self.transitions:
+			if(transition.fromState == fromState and transition.toState == toState and transition.symbol == symbol):
+				return True
+		return False
+
 	def addState(self, state):
 		self.states.add(state)
 
@@ -305,26 +311,43 @@ class FSM:
 				if exState in fsm.acceptingStates:
 					DFSM.grantAcceptingState(setToString(newState))
 
-		DFSM.renameStates('', 0)
+		lastStateIndex = DFSM.renameStates('', 0)
+		transitionsToAdd = set()
+
+		#
+		#
+		# Problem when adding transitions to garbage state 
+		#
+		#
+		for symbol in alphabet:
+			for fromState in DFSM.states:
+				for toState in DFSM.states:
+					if not DFSM.isTransitionIn(fromState, toState, symbol):
+						transitionsToAdd.add(Transition(fromState, lastStateIndex, symbol))
+		for transition in transitionsToAdd:
+			DFSM.addTransition(transition.fromState, transition.toState, transition.symbol)
+
 		return DFSM
 
 
 #
-# No done yet 
+# Not done yet 
 #
 #
 	def match(self, string):
 		""" Tries to match an input string to the FSM. If, at the end of the input string, 
 		the current state is accepting, returns True, else rturns false """
-		currentState = self.initialState;
+
+		fsm = FSM.determinise(self)
+
+		currentState = fsm.initialState;
 		currentStringIndex = 0
 
-		# don't forget to determinise the FSM first!!
 		# determinise, just add a "garbage" state, so every transition exist? and then it's easier to compute?
 
 		while currentStringIndex != len(string):
 			# All transitions from the current state
-			transitionsFromCurrentState = set(transition for transition in self.transitions if transition.fromState == currentState)
+			transitionsFromCurrentState = set(transition for transition in fsm.transitions if transition.fromState == currentState)
 			
 			# all transitions that matches something at the right index of the string
 			# supposed to have only 1 transition in the set because its deterministic
@@ -337,7 +360,7 @@ class FSM:
 				currentState = matchingSet.pop().toState
 				currentStringIndex += 1
 		print currentState
-		if currentState in self.acceptingStates:
+		if currentState in fsm.acceptingStates:
 			return True
 		return False
 
