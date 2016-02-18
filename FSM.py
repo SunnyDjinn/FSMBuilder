@@ -5,9 +5,11 @@ from graphviz import Digraph
 SPECIAL_STATE_CHARACTER = '$$'
 EPSILON = '###'
 
-# Class Transition
-# Defines a transition with a from state, a to state and a symbol
 class Transition:
+""" 
+	Class Transition
+ 	Defines a transition with a from state, a to state and a symbol
+"""
 	def __init__(self, fromState, toState, symbol):
 		self.fromState = fromState
 		self.toState = toState
@@ -16,11 +18,17 @@ class Transition:
 	def toString(self):
 		return str(self.fromState) + ", " + str(self.toState) + ", " + str(self.symbol)
 
-# Class Finite State Machine
-# Defines a FSM with an initial state, a set of accepting states and a matrix of its transitions
-class FSM:
 
+class FSM:
+"""
+	Class Finite State Machine
+	Defines a FSM with an initial state, a set of accepting states and a matrix of its transitions
+"""
 	def __init__(self, initialState, acceptingStates):
+		"""
+			FSM Constructor
+			Takes an initial state and an iterable object of accepting states
+		"""
 		try:
 			self.initialState = initialState
 			self.acceptingStates = set()
@@ -37,6 +45,10 @@ class FSM:
 			return None
 
 	def addTransition(self, fromState, toState, symbol):
+	"""
+		Adds a transition to the FSM
+		Takes a beginning state, and arrival state, and a symbol to define the transition
+	"""
 		if symbol == "":
 			print "Cannot add transition: symbol field empty"
 			return
@@ -45,6 +57,10 @@ class FSM:
 		self.states.add(toState)
 
 	def removeTransition(self, fromState, toState, symbol):
+	"""
+		Removes a transition from the FSM
+		Idintifies the transition with the beginning state, the arrival state and its associated symbol
+	"""
 		for transition in self.transitions:
 			if transition.fromState == fromState and transition.toState == toState and transition.symbol == symbol:
 				self.transitions.remove(transition)
