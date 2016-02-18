@@ -265,6 +265,25 @@ class FSM:
 			alphabet.remove(EPSILON)
 		return alphabet
 
+	def hasSymbolTransition(self, fromState, symbol):
+		for transition in self.transitions:
+			if transition.fromState == fromState and transition.symbol == symbol:
+				return True
+		return False
+
+	def addDeadState(self, deadState):
+		""" Adds a dead state to a FSM when it is deterministic but not complete. For every state and every symbole, if there does not 
+		exist a transition from the  state with the symbol, it adds such a transition to a dead state, where nothing is reachable from """
+		alphabet = self.__computeAlphabet()
+		transitionsToAdd = set()
+
+		for symbol in alphabet:
+			for fromState in self.states:
+				if not self.hasSymbolTransition(fromState, symbol):
+					transitionsToAdd.add(Transition(fromState, deadState, symbol))
+		for transition in transitionsToAdd:
+			self.addTransition(transition.fromState, transition.toState, transition.symbol)
+
 
 #
 #
@@ -312,20 +331,7 @@ class FSM:
 					DFSM.grantAcceptingState(setToString(newState))
 
 		lastStateIndex = DFSM.renameStates('', 0)
-		transitionsToAdd = set()
-
-		#
-		#
-		# Problem when adding transitions to garbage state 
-		#
-		#
-		for symbol in alphabet:
-			for fromState in DFSM.states:
-				for toState in DFSM.states:
-					if not DFSM.isTransitionIn(fromState, toState, symbol):
-						transitionsToAdd.add(Transition(fromState, lastStateIndex, symbol))
-		for transition in transitionsToAdd:
-			DFSM.addTransition(transition.fromState, transition.toState, transition.symbol)
+		DFSM.addDeadState(lastStateIndex)
 
 		return DFSM
 
