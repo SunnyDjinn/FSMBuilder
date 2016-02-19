@@ -3,12 +3,18 @@ from FSM import *
 
 print "Creating x as follows..."
 x = FSM(1, [])
-x.addTransition(1, 2, 'a')
+x.addTransition(1, 2, 'ab')
 x.addTransition(1, 3, 'b')
 x.addTransition(2, 3, 'b')
 x.grantAcceptingState(3)
-#rint x.toString()
+print x.toString()
 
+x.breakMultipleCharactersTransitions()
+
+print x.toString()
+x.draw()
+
+exit()
 k = FSM.kleene(x)
 
 print k.toString()

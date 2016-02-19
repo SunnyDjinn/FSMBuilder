@@ -6,10 +6,10 @@ SPECIAL_STATE_CHARACTER = '$$'
 EPSILON = '###'
 
 class Transition:
-""" 
+	""" 
 	Class Transition
  	Defines a transition with a from state, a to state and a symbol
-"""
+	"""
 	def __init__(self, fromState, toState, symbol):
 		self.fromState = fromState
 		self.toState = toState
@@ -20,10 +20,10 @@ class Transition:
 
 
 class FSM:
-"""
+	"""
 	Class Finite State Machine
 	Defines a FSM with an initial state, a set of accepting states and a matrix of its transitions
-"""
+	"""
 	def __init__(self, initialState, acceptingStates):
 		"""
 			FSM Constructor
@@ -45,10 +45,10 @@ class FSM:
 			return None
 
 	def addTransition(self, fromState, toState, symbol):
-	"""
+		"""
 		Adds a transition to the FSM
 		Takes a beginning state, and arrival state, and a symbol to define the transition
-	"""
+		"""
 		if symbol == "":
 			print "Cannot add transition: symbol field empty"
 			return
@@ -57,10 +57,10 @@ class FSM:
 		self.states.add(toState)
 
 	def removeTransition(self, fromState, toState, symbol):
-	"""
+		"""
 		Removes a transition from the FSM
 		Idintifies the transition with the beginning state, the arrival state and its associated symbol
-	"""
+		"""
 		for transition in self.transitions:
 			if transition.fromState == fromState and transition.toState == toState and transition.symbol == symbol:
 				self.transitions.remove(transition)
@@ -288,8 +288,10 @@ class FSM:
 		return False
 
 	def addDeadState(self, deadState):
-		""" Adds a dead state to a FSM when it is deterministic but not complete. For every state and every symbole, if there does not 
-		exist a transition from the  state with the symbol, it adds such a transition to a dead state, where nothing is reachable from """
+		""" 
+		Adds a dead state to a FSM when it is deterministic but not complete. For every state and every symbole, if there does not 
+		exist a transition from the  state with the symbol, it adds such a transition to a dead state, where nothing is reachable from 
+		"""
 		alphabet = self.__computeAlphabet()
 		transitionsToAdd = set()
 
@@ -300,6 +302,25 @@ class FSM:
 		for transition in transitionsToAdd:
 			self.addTransition(transition.fromState, transition.toState, transition.symbol)
 
+	def breakMultipleCharactersTransitions(self):
+		""" 
+		For every single transition that requires multiple characters at the same time, breaks the transition into multiple ones, 
+		adding required new states 
+		"""
+		stateCounter = self.renameStates(SPECIAL_STATE_CHARACTER, 0)
+		transitions = copy.deepcopy(self.transitions)
+
+		for transition in transitions:
+			if len(str(transition.symbol)) > 1:
+				self.removeTransition(transition.fromState, transition.toState, transition.symbol)
+				self.addTransition(transition.fromState, SPECIAL_STATE_CHARACTER + str(stateCounter), str(transition.symbol)[0] ) # first transition
+				stateCounter += 1
+				for character in range(2, len(str(transition.symbol))-1): # intermediate transitions
+					self.addTransition(SPECIAL_STATE_CHARACTER + str(stateCounter-1), SPECIAL_STATE_CHARACTER + str(stateCounter), str(transition.symbol)[character])
+					stateCounter += 1
+				self.addTransition( SPECIAL_STATE_CHARACTER + str(stateCounter-1), transition.toState, str(transition.symbol)[len(str(transition.symbol))-1]) # last transition
+
+		self.renameStates('', 0)
 
 #
 #
