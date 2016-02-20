@@ -52,9 +52,9 @@ class FSM:
 		if symbol == "":
 			print "Cannot add transition: symbol field empty"
 			return
-		self.transitions.add(Transition(fromState, toState, symbol))
-		self.states.add(fromState)
-		self.states.add(toState)
+		self.transitions.add(Transition(str(fromState), str(toState), str(symbol)))
+		self.states.add(str(fromState))
+		self.states.add((toState))
 
 	def removeTransition(self, fromState, toState, symbol):
 		"""
@@ -62,7 +62,7 @@ class FSM:
 		Idintifies the transition with the beginning state, the arrival state and its associated symbol
 		"""
 		for transition in self.transitions:
-			if transition.fromState == fromState and transition.toState == toState and transition.symbol == symbol:
+			if str(transition.fromState) == str(fromState) and str(transition.toState) == str(toState) and str(transition.symbol) == str(symbol):
 				self.transitions.remove(transition)
 				break
 
@@ -134,6 +134,12 @@ class FSM:
 		if newState == SPECIAL_STATE_CHARACTER:
 			print "State Name Reserved"
 			return None
+		#
+		#
+		#	ERROR: renames two times the same states (why?)
+		#
+		#
+		print "renaming " + str(state) + " into " + str(newState)
 		transitionsToAdd = set()
 		willGrantAcceptingState = False
 		willGrantInitialState = False
@@ -159,11 +165,12 @@ class FSM:
 
 	def renameStates(self, specialStateCharacter, stateCounter):
 		statesToRename = copy.deepcopy(sorted(self.states, reverse=True))
-		
+		print statesToRename
 		while len(statesToRename) > 0:
 			state = statesToRename.pop()
 			self.renameState(state, specialStateCharacter + str(stateCounter))
 			stateCounter += 1
+			print statesToRename
 		return stateCounter
 
 
@@ -308,9 +315,13 @@ class FSM:
 		adding required new states 
 		"""
 		stateCounter = self.renameStates(SPECIAL_STATE_CHARACTER, 0)
+		self.draw()
+		print stateCounter
 		transitions = copy.deepcopy(self.transitions)
 
 		for transition in transitions:
+			if transition.symbol == EPSILON:
+				continue
 			if len(str(transition.symbol)) > 1:
 				self.removeTransition(transition.fromState, transition.toState, transition.symbol)
 				self.addTransition(transition.fromState, SPECIAL_STATE_CHARACTER + str(stateCounter), str(transition.symbol)[0] ) # first transition
@@ -325,13 +336,17 @@ class FSM:
 #
 #
 # Refactor determinise
-# break every multicharacter symbols in multiple states that follow each other (before doing anything else)
 #
 #
 	@staticmethod
-	def determinise(fsm):
+	def determinise(fsmUnmodified):
 		""" Determinises a NDFSM into and FSM - removes epsilon transitions, multiple chracters symbols and multiple transitions for the
 		same character between equivalent pairs of states """
+		fsm = copy.deepcopy(fsmUnmodified)
+		fsm.breakMultipleCharactersTransitions()
+		#fsm.draw()
+		exit()
+
 		fsm.renameStates(SPECIAL_STATE_CHARACTER, 0)
 		epsStates = {str(state):fsm.__epsilonAccessible(state) for state in fsm.states}
 		alphabet = fsm.__computeAlphabet()
@@ -368,7 +383,7 @@ class FSM:
 					DFSM.grantAcceptingState(setToString(newState))
 
 		lastStateIndex = DFSM.renameStates('', 0)
-		DFSM.addDeadState(lastStateIndex)
+		#DFSM.addDeadState(lastStateIndex)
 
 		return DFSM
 
