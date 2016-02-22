@@ -11,9 +11,9 @@ class Transition:
  	Defines a transition with a from state, a to state and a symbol
 	"""
 	def __init__(self, fromState, toState, symbol):
-		self.fromState = fromState
-		self.toState = toState
-		self.symbol = symbol
+		self.fromState = str(fromState)
+		self.toState = str(toState)
+		self.symbol = str(symbol)
 
 	def toString(self):
 		return str(self.fromState) + ", " + str(self.toState) + ", " + str(self.symbol)
@@ -30,15 +30,15 @@ class FSM:
 			Takes an initial state and an iterable object of accepting states
 		"""
 		try:
-			self.initialState = initialState
+			self.initialState = str(initialState)
 			self.acceptingStates = set()
 			self.states = set()
 			for state in acceptingStates:
-				self.acceptingStates.add(state)
+				self.acceptingStates.add(str(state))
 			for state in acceptingStates:
-				self.states.add(state)
+				self.states.add(str(state))
 
-			self.states.add(initialState)
+			self.states.add(str(initialState))
 			self.transitions = set()
 		except TypeError:
 			print "Usage: FSM((int)<initialState>, (set, list) <acceptingStates>)"
@@ -49,20 +49,26 @@ class FSM:
 		Adds a transition to the FSM
 		Takes a beginning state, and arrival state, and a symbol to define the transition
 		"""
+		fromState = str(fromState)
+		toState = str(toState)
+		symbol = str(symbol)
 		if symbol == "":
 			print "Cannot add transition: symbol field empty"
 			return
-		self.transitions.add(Transition(str(fromState), str(toState), str(symbol)))
-		self.states.add(str(fromState))
-		self.states.add((toState))
+		self.transitions.add(Transition(fromState, toState, symbol))
+		self.states.add(fromState)
+		self.states.add(toState)
 
 	def removeTransition(self, fromState, toState, symbol):
 		"""
 		Removes a transition from the FSM
 		Idintifies the transition with the beginning state, the arrival state and its associated symbol
 		"""
+		fromState = str(fromState)
+		toState = str(toState)
+		symbol = str(symbol)
 		for transition in self.transitions:
-			if str(transition.fromState) == str(fromState) and str(transition.toState) == str(toState) and str(transition.symbol) == str(symbol):
+			if transition.fromState == fromState and transition.toState == toState and transition.symbol == symbol:
 				self.transitions.remove(transition)
 				break
 
@@ -73,27 +79,33 @@ class FSM:
 				self.acceptingStates.remove(state)
 
 	def existsTransitionFrom(self, fromState):
+		fromState = str(fromState)
 		for transition in self.transitions:
 			if transition.fromState == fromState:
 				return True
 		return False
 
 	def existsTranstitionTo(self, toState):
+		toState = str(toState)
 		for transition in self.transitions:
 			if transition.toState == toState:
 				return True
 		return False
 
 	def isTransitionIn(self, fromState, toState, symbol):
+		fromState = str(fromState)
+		toState = str(toState)
+		symbol = str(symbol)
 		for transition in self.transitions:
 			if(transition.fromState == fromState and transition.toState == toState and transition.symbol == symbol):
 				return True
 		return False
 
 	def addState(self, state):
-		self.states.add(state)
+		self.states.add(str(state))
 
 	def removeState(self, state):
+		state = str(state)
 		if state == self.initialState:
 			self.initialState = None
 		transitionsToRemove = set()
@@ -109,16 +121,18 @@ class FSM:
 			self.acceptingStates.remove(state)
 
 	def replaceInitialState(self, newInitialState):
-		self.initialState = newInitialState
+		self.initialState = str(newInitialState)
 
 	def createElem(self, fromState, toState, symbol):
 		self.addTransition(Transition(fromState, toState, symbol))
 
 	def grantAcceptingState(self, state):
+		state = str(state)
 		if state not in self.acceptingStates and state in self.states:
 			self.acceptingStates.add(state)
 
 	def ungrantAcceptingState(self, state):
+		state = str(state)
 		if state in self.acceptingStates:
 			self.acceptingStates.remove(state)
 
@@ -128,6 +142,8 @@ class FSM:
 				+ '\nAccepting States: ' + ", ".join(str(state) for state in sorted(self.acceptingStates)) + '\n')
 
 	def renameState(self, state, newState):
+		state = str(state)
+		newState = str(state)
 		if newState in self.states:
 			print "Cannot rename: state " + str(state) + " already existing"
 			return None
