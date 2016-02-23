@@ -143,19 +143,14 @@ class FSM:
 
 	def renameState(self, state, newState):
 		state = str(state)
-		newState = str(state)
+		newState = str(newState)
 		if newState in self.states:
-			print "Cannot rename: state " + str(state) + " already existing"
+			print "Cannot rename: state " + str(newState) + " already existing"
 			return None
 		if newState == SPECIAL_STATE_CHARACTER:
 			print "State Name Reserved"
 			return None
-		#
-		#
-		#	ERROR: renames two times the same states (why?)
-		#
-		#
-		print "renaming " + str(state) + " into " + str(newState)
+
 		transitionsToAdd = set()
 		willGrantAcceptingState = False
 		willGrantInitialState = False
@@ -181,12 +176,10 @@ class FSM:
 
 	def renameStates(self, specialStateCharacter, stateCounter):
 		statesToRename = copy.deepcopy(sorted(self.states, reverse=True))
-		print statesToRename
 		while len(statesToRename) > 0:
-			state = statesToRename.pop()
+			state = str(statesToRename.pop())
 			self.renameState(state, specialStateCharacter + str(stateCounter))
 			stateCounter += 1
-			print statesToRename
 		return stateCounter
 
 
@@ -272,9 +265,10 @@ class FSM:
 		for state in kleenedFsm.acceptingStates:
 			kleenedFsm.addTransition(state, kleenedFsm.initialState, EPSILON)
 
-		kleenedFsm.addState(0)
-		kleenedFsm.addTransition(0, kleenedFsm.initialState, EPSILON)
-		kleenedFsm.replaceInitialState(0)
+		newInitialState = SPECIAL_STATE_CHARACTER + str(0)
+		kleenedFsm.addState(newInitialState)
+		kleenedFsm.addTransition(newInitialState, kleenedFsm.initialState, EPSILON)
+		kleenedFsm.replaceInitialState(newInitialState)
 		kleenedFsm.grantAcceptingState(kleenedFsm.initialState)
 
 		kleenedFsm.renameStates('', 0)
@@ -331,8 +325,6 @@ class FSM:
 		adding required new states 
 		"""
 		stateCounter = self.renameStates(SPECIAL_STATE_CHARACTER, 0)
-		self.draw()
-		print stateCounter
 		transitions = copy.deepcopy(self.transitions)
 
 		for transition in transitions:
@@ -360,8 +352,6 @@ class FSM:
 		same character between equivalent pairs of states """
 		fsm = copy.deepcopy(fsmUnmodified)
 		fsm.breakMultipleCharactersTransitions()
-		#fsm.draw()
-		exit()
 
 		fsm.renameStates(SPECIAL_STATE_CHARACTER, 0)
 		epsStates = {str(state):fsm.__epsilonAccessible(state) for state in fsm.states}

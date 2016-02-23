@@ -11,20 +11,17 @@ x.grantAcceptingState(3)
 
 x.breakMultipleCharactersTransitions()
 
-#print x.toString()
-
-
+print x.toString()
 
 k = FSM.kleene(x)
 
 k.addTransition(1, 3, 'bb')
 k.removeTransition(1, 3, 'b')
 print k.toString()
-#k.draw()
 
 dfsm = FSM.determinise(k)
 print dfsm.toString()
-#dfsm.draw()
+dfsm.draw()
 
 exit()
 
