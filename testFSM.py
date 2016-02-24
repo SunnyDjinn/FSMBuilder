@@ -23,6 +23,8 @@ dfsm = FSM.determinise(k)
 print dfsm.toString()
 dfsm.draw()
 
+print dfsm.match("abbbbbbabb")
+
 exit()
 
 print "Creating y as follows..."

@@ -309,6 +309,7 @@ class FSM:
 		Adds a dead state to a FSM when it is deterministic but not complete. For every state and every symbole, if there does not 
 		exist a transition from the  state with the symbol, it adds such a transition to a dead state, where nothing is reachable from 
 		"""
+		deadState = str(deadState)
 		alphabet = self.__computeAlphabet()
 		transitionsToAdd = set()
 
@@ -318,6 +319,9 @@ class FSM:
 					transitionsToAdd.add(Transition(fromState, deadState, symbol))
 		for transition in transitionsToAdd:
 			self.addTransition(transition.fromState, transition.toState, transition.symbol)
+		# adding transitions from dead state to itself
+		for symbol in alphabet:
+			self.addTransition(deadState, deadState, symbol)
 
 	def breakMultipleCharactersTransitions(self):
 		""" 
@@ -389,7 +393,7 @@ class FSM:
 					DFSM.grantAcceptingState(setToString(newState))
 
 		lastStateIndex = DFSM.renameStates('', 0)
-		#DFSM.addDeadState(lastStateIndex)
+		DFSM.addDeadState(lastStateIndex)
 
 		return DFSM
 
