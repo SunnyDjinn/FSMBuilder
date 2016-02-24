@@ -101,6 +101,15 @@ class FSM:
 				return True
 		return False
 
+	def __whereToTransition(self, fromState, symbol):
+		fromState = str(fromState)
+		symbol = str(symbol)
+		if not self.existsTransitionFrom(fromState):
+			return None
+		for transition in self.transitions:
+			if transition.fromState == fromState and transition.symbol == symbol: 
+				return transition.toState					# assuming only one exist, which should be the case is deterministic
+
 	def addState(self, state):
 		self.states.add(str(state))
 
@@ -404,30 +413,22 @@ class FSM:
 #
 	def match(self, string):
 		""" Tries to match an input string to the FSM. If, at the end of the input string, 
-		the current state is accepting, returns True, else rturns false """
+		the current state is accepting, returns True, else returns false """
 
 		fsm = FSM.determinise(self)
 
+		alphabet = fsm.__computeAlphabet()
 		currentState = fsm.initialState;
 		currentStringIndex = 0
 
-		# determinise, just add a "garbage" state, so every transition exist? and then it's easier to compute?
-
 		while currentStringIndex != len(string):
-			# All transitions from the current state
-			transitionsFromCurrentState = set(transition for transition in fsm.transitions if transition.fromState == currentState)
 			
-			# all transitions that matches something at the right index of the string
-			# supposed to have only 1 transition in the set because its deterministic
-			matchingSet = set(transition for transition in transitionsFromCurrentState if string.find(transition.symbol) == currentStringIndex)
-			# matching set doesn't work: transition from 3 to 4 reading c (maybe it reads something else) says no match 
-			if len(matchingSet) == 0: # no matching transitions
-				print "no match from " + str(currentState)
+			if string[currentStringIndex] not in alphabet:
 				return False
-			else:
-				currentState = matchingSet.pop().toState
-				currentStringIndex += 1
-		print currentState
+
+			currentState = fsm.__whereToTransition(currentState, string[currentStringIndex])
+			currentStringIndex += 1
+
 		if currentState in fsm.acceptingStates:
 			return True
 		return False

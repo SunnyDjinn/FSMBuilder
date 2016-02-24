@@ -23,7 +23,14 @@ dfsm = FSM.determinise(k)
 print dfsm.toString()
 dfsm.draw()
 
-print dfsm.match("abbbbbbabb")
+print dfsm.match("abbbbbbabb") 	# True
+print dfsm.match("abb")			# True
+print dfsm.match("bb")			# True
+print dfsm.match("a")			# False
+print dfsm.match("b")			# False
+print dfsm.match("aa")			# False
+print dfsm.match("bb")			# True
+print dfsm.match("c")			# True
 
 exit()
 
