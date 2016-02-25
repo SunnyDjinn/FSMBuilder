@@ -407,10 +407,23 @@ class FSM:
 		return DFSM
 
 
-#
-# Not done yet 
-#
-#
+	@staticmethod
+	def minimize(fsmUnmodified):
+		fsm = copy.deepcopy(fsmUnmodified)
+		alphabet = fsm.__computeAlphabet()
+		classes = set()
+		classes.add(set(fsm.acceptingStates), set(state for state in fsm.states if state not in fsm.acceptingStates))
+		changesMade = True
+		while changesMade:
+			newClasses = set()
+			for eqClass in classes:
+				if len(eqClass) > 1:
+					for state in eqClass:
+						# look at each state and build a table?
+						for c in alphabet:
+							# how to remember which state goes where when decided?
+
+
 	def match(self, string):
 		""" Tries to match an input string to the FSM. If, at the end of the input string, 
 		the current state is accepting, returns True, else returns false """
