@@ -429,7 +429,7 @@ class FSM:
 							# how to remember which state goes where when decided?
 						eqClassStatesTransTable[state] = stateGoesTo
 						del stateGoesTo
-					for key in eqClassStatesTransTable:
+					#for key in eqClassStatesTransTable:
 
 						# I don't know where I'm going right now. Needs to be thought before trying anything. Will tryi again later
 
