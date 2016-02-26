@@ -102,13 +102,16 @@ class FSM:
 		return False
 
 	def __whereToTransition(self, fromState, symbol):
+		"""
+			Determines where does a transition from fromState goes to, when reading symbol. /!\ HAS TO BE DETERMINISTIC /!\
+		"""
 		fromState = str(fromState)
 		symbol = str(symbol)
 		if not self.existsTransitionFrom(fromState):
 			return None
 		for transition in self.transitions:
 			if transition.fromState == fromState and transition.symbol == symbol: 
-				return transition.toState					# assuming only one exist, which should be the case is deterministic
+				return transition.toState					# assuming only one exist, which should be the case if deterministic
 
 	def addState(self, state):
 		self.states.add(str(state))
@@ -333,10 +336,8 @@ class FSM:
 			self.addTransition(deadState, deadState, symbol)
 
 	def breakMultipleCharactersTransitions(self):
-		""" 
-		For every single transition that requires multiple characters at the same time, breaks the transition into multiple ones, 
-		adding required new states 
-		"""
+		""" For every single transition that requires multiple characters at the same time, breaks the transition into multiple ones, 
+		adding required new states """
 		stateCounter = self.renameStates(SPECIAL_STATE_CHARACTER, 0)
 		transitions = copy.deepcopy(self.transitions)
 
@@ -409,19 +410,29 @@ class FSM:
 
 	@staticmethod
 	def minimize(fsmUnmodified):
-		fsm = copy.deepcopy(fsmUnmodified)
+		fsm = FSM.determinize(fsmUnmodified)
 		alphabet = fsm.__computeAlphabet()
 		classes = set()
 		classes.add(set(fsm.acceptingStates), set(state for state in fsm.states if state not in fsm.acceptingStates))
 		changesMade = True
 		while changesMade:
+			changesMade = False
 			newClasses = set()
 			for eqClass in classes:
 				if len(eqClass) > 1:
+					eqClassStatesTransTable = {}
 					for state in eqClass:
+						stateGoesTo = []
 						# look at each state and build a table?
 						for c in alphabet:
+							stateGoesTo.append(eqClass for eqClass in classes if fsm.__whereToTransition(state, c) in eqClass)
 							# how to remember which state goes where when decided?
+						eqClassStatesTransTable[state] = stateGoesTo
+						del stateGoesTo
+					for key in eqClassStatesTransTable:
+
+						# I don't know where I'm going right now. Needs to be thought before trying anything. Will tryi again later
+
 
 
 	def match(self, string):
